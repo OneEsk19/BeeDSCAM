@@ -1,0 +1,80 @@
+---
+title: "Extracting Multi-mappers"
+author: "G.Robertson"
+date: "30/03/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+## Working with bash
+
+### Got .sam files, want to extract specific parts of the file
+
+To extract unique mappers:
+```{bash}
+fgrep -w NH:i:1 seq1.5F1A_unp.NG-8304_Dscam1_lib80429_3962_1_Aligned.sortedByCoord.out.sam > test.sam
+```
+
+To extract multimappers:
+```{bash}
+fgrep -vw NH:i:1 file > newfile
+```
+
+_________________________________________________________________________
+Retain only uniquely mapping reads (reads with a single unambigous mapping location):
+```{bash}
+samtools view reads.bam | grep 'XT:A:U' | samtools view -bS -T referenceSequence.fa - > reads.uniqueMap.bam
+```
+_________________________________________________________________________
+
+
+List the sam files:
+```{r}
+ls *.sam
+```
+
+List and Key:
+0)seq1.5F1A_unp.NG-8304_Dscam1_lib80429_3962_1_Aligned.sortedByCoord.out.sam
+1)seq1.5F1B_p.NG-8304_Dscam1_lib80429_3962_1_Aligned.sortedByCoord.out.sam
+2) seq1.9F2_p.NG-8304_Dscam1_lib80429_3962_1_Aligned.sortedByCoord.out.sam
+3) seq2.5F1A_unp.NG-8304_Dscam1_lib80429_3962_1_Aligned.sortedByCoord.out.sam
+4) seq2.5F1A_unp.NG-8304_Dscam1_lib80429_4024_1_Aligned.sortedByCoord.out.sam
+5) seq2.5F1A_unp.NG-8304_Dscam1_lib80429_4049_1_Aligned.sortedByCoord.out.sam
+6) seq2.5F1B_p.NG-8304_Dscam1_lib80429_3962_1_Aligned.sortedByCoord.out.sam
+7) seq2.5F1B_p.NG-8304_Dscam1_lib80429_4024_1_Aligned.sortedByCoord.out.sam
+8) seq2.5F1B_p.NG-8304_Dscam1_lib80429_4049_1_Aligned.sortedByCoord.out.sam
+9) seq2.9F2_p.NG-8304_Dscam1_lib80429_3962_1_Aligned.sortedByCoord.out.sam
+10) seq2.9F2_p.NG-8304_Dscam1_lib80429_4024_1_Aligned.sortedByCoord.out.sam
+11) seq2.9F2_p.NG-8304_Dscam1_lib80429_4049_1_Aligned.sortedByCoord.out.sam
+
+Exclude chromosome 4:
+```{bash}
+fgrep -vw 4 seq1.5F1A_unp.NG-8304_Dscam1_lib80429_3962_1_Aligned.sortedByCoord.out.sam > t1.txt
+
+fgrep -vw "\*" t1.txt
+```
+
+For each .sam file:
+```{bash}
+fgrep -vw 4 seq1.5F1B_p.NG-8304_Dscam1_lib80429_3962_1_Aligned.sortedByCoord.out.sam > t2.txt
+
+fgrep -vw NH:i:0 t2.txt > res1.txt
+```
+
+Each one was then merged into one file with headings indicating the key (above).
+
+To extract only the sequence information from the above file for uploading to BLAT/BLAST:
+```{bash}
+# Separate line by line
+xargs -n 1 <all_MM_seqs.txt  > linebyline.txt
+
+# Extract the nt sequences
+awk '/A/ && /G/ && /C/ && /T/' linebyline.txt > mmseqs.txt
+
+# Remove duplicates:
+sort -u mmseqs.txt > uniq_mms.txt
+```
+
