@@ -1,0 +1,117 @@
+---
+title: "comparingMetrics"
+author: "Georgina Robertson"
+date: "28/04/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Basic metrics for seeing how splice junctions are distributed between learning and control
+
+```{r eval=FALSE, include=FALSE}
+# read in the data
+comp3692a_s1 <- read.csv("R_bee/CompareFiles/seq1_3692_pVSunp_Exon6.tsv", sep = "\t")
+
+# change some of the names
+comp3692a_s1$category[comp3692a_s1$category == "unique in 'seq1.5F1B_p.NG-8304_Dscam1_lib80429_3962_1_SJ.out.tab'"] <- "Learning only"
+
+comp3692a_s1$category[comp3692a_s1$category == "unique in 'seq1.5F1A_unp.NG-8304_Dscam1_lib80429_3962_1_SJ.out.tab'"] <- "Control only"
+```
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+# create barplot of counts
+plt3692 <- ggplot(comp3692a_s1, aes(category)) +
+geom_bar(fill = "#9ea0d9") +
+  labs(x = "Splice junctions", y= "Count", title = "Experiment 3692a") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+plt3692
+```
+ 
+```{r eval=FALSE, include=FALSE}
+comp3692a_s2 <- read.csv("R_bee/CompareFiles/seq2_3692_pVSunp_Exon6.tsv", sep = "\t")
+
+comp3692a_s2$category[comp3692a_s2$category == "unique in 'seq2.5F1B_p.NG-8304_Dscam1_lib80429_3962_1_SJ.out.tab'"] <- "Learning only"
+
+comp3692a_s2$category[comp3692a_s2$category == "unique in 'seq2.5F1A_unp.NG-8304_Dscam1_lib80429_3962_1_SJ.out.tab'"] <- "Control only"
+```
+ 
+```{r}
+plt3692b <- ggplot(comp3692a_s2, aes(category)) +
+geom_bar(fill = "#b0d99e") +
+  labs(x = "Splice junctions", y= "Count", title = "Experiment 3692b") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+plt3692b
+```
+
+```{r eval=FALSE, include=FALSE}
+comp4024 <- read.csv("R_bee/CompareFiles/seq2_4024_pVSunp_Exon6.tsv", sep = "\t")
+
+comp4024$category[comp4024$category == "unique in 'seq2.5F1B_p.NG-8304_Dscam1_lib80429_4024_1_SJ.out.tab'"] <- "Learning only"
+
+comp4024$category[comp4024$category == "unique in 'seq2.5F1A_unp.NG-8304_Dscam1_lib80429_4024_1_SJ.out.tab'"] <- "Control only"
+```
+ 
+```{r}
+plt4024 <- ggplot(comp4024, aes(category)) +
+geom_bar(fill = "#d9b79e") +
+  labs(x = "Splice junctions", y= "Count", title = "Experiment 4024") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+plt4024
+```
+
+```{r eval=FALSE, include=FALSE}
+comp4049 <- read.csv("R_bee/CompareFiles/seq2_4049_pVSunp_Exon6.tsv", sep = "\t")
+
+comp4049$category[comp4049$category == "unique in 'seq2.5F1B_p.NG-8304_Dscam1_lib80429_4049_1_SJ.out.tab'"] <- "Learning only"
+
+comp4049$category[comp4049$category == "unique in 'seq2.5F1A_unp.NG-8304_Dscam1_lib80429_4049_1_SJ.out.tab'"] <- "Control only"
+```
+ 
+```{r}
+plt4049 <- ggplot(comp4024, aes(category)) +
+geom_bar(fill = "#ded498") +
+  labs(x = "Splice junctions", y= "Count", title = "Experiment 4049") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+plt4049
+```
+
+```{r}
+library(gridExtra)
+```
+
+```{r}
+grid.arrange(plt3692, plt3692b, plt4024, plt4049, nrow=2)
+```
+
+```{r eval=FALSE, include=FALSE}
+pdf("comp3692a.pdf")
+print(plt3692)
+dev.off()
+
+pdf("comp3692b.pdf")
+print(plt3692b)
+dev.off()
+
+pdf("comp4024.pdf")
+print(plt4024)
+dev.off()
+
+pdf("comp4049.pdf")
+print(plt4049)
+dev.off()
+
+
+
+```
+
