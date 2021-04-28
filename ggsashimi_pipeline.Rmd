@@ -1,0 +1,169 @@
+---
+title: "ggsashimi pipeline"
+output:
+  rmarkdown::html_document:
+    theme: cerulean
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+  
+  
+First I changed the filenames in Bash to more manageable and meaningful examples using the following Key and Code:
+
+#### Key  
+
++ Primers:  
+1. GAATTCGTTATAGCCC  
+2. GAATTCGTTATAGCCT  
++ Seqs:  
+1. CCATGAGTGGCTTTCGGCTACCAAGGGACGACTCGTCATTAC___CCATGAGTGCGGGACGAGCCCTCGATGAACTTGTAC  
+2. CGCTAGGGGAACGTTGGAGGTTCAAGTG___CGTCGGAGCCTTGAGCGAATGCCTTGTC  
+3. CGTCTAATGGCTTTCGGCTACCAAGGGACGACTCGTCATTAC___CGTCTAATGCGGGACGAGCCCTCGATGAACTTGTAC    
+
+##### Applied to the files in directory:  
+/analysis_pipeline_for_bee/alignment/alignment_results_separate
+
+```{bash eval=FALSE, include=TRUE}
+# bash
+rename "s/GAATTCGTTATAGCCC/Prim1/g" *GAATTCGTTATAGCCC*
+
+rename "s/GAATTCGTTATAGCCT/Prim2/g" *GAATTCGTTATAGCCT*
+
+rename "s/CCATGAGTGGCTTTCGGCTACCAAGGGACGACTCGTCATTAC___CCATGAGTGCGGGACGAGCCCTCGATGAACTTGTAC/Seq1/g" *CCATGAGTGGCTTTCGGCTACCAAGGGACGACTCGTCATTAC___CCATGAGTGCGGGACGAGCCCTCGATGAACTTGTAC*
+
+rename "s/CGCTAGGGGAACGTTGGAGGTTCAAGTG___CGTCGGAGCCTTGAGCGAATGCCTTGTC/Seq2/g" *CGCTAGGGGAACGTTGGAGGTTCAAGTG___CGTCGGAGCCTTGAGCGAATGCCTTGTC*
+
+rename "s/CGTCTAATGGCTTTCGGCTACCAAGGGACGACTCGTCATTAC___CGTCTAATGCGGGACGAGCCCTCGATGAACTTGTAC/Seq3/g" *CGTCTAATGGCTTTCGGCTACCAAGGGACGACTCGTCATTAC___CGTCTAATGCGGGACGAGCCCTCGATGAACTTGTAC*
+```
+
+_____________________________________________________________________________________________
+
+#### Files needed for ggsashimi
+* .bam files from above folder
+* genome file (.fa or .fasta)
+* annotation file for above genome (.gtf)
+* optional .tsv file containing list of .bam files in the format:
+  +  id, path, experiment
+   + e.g: P1S1_3692	Prim1.Seq1.NG-8304_Dscam1_lib80429_3962_1_Aligned.sortedByCoord.out.bam	3962
+* palette file (palette.txt)
+  + containing a list of colours in hex code or named
+  
+#### Installation of ggsashimi
+As per instructions @
+https://github.com/guigolab/ggsashimi#installation  
+    
+##### Plotting all
+```{bash eval=FALSE, include=TRUE}
+# bash
+./sashimi-plot.py -b input_bams.tsv -c 4:9807598-9840852 -g annotation_bee_4.5.gtf -M 10 -C 3 -O 3 --shrink --alpha 0.25 --base-size=20 --ann-height=4 --height=3 --width=18 -P palette.txt
+```
+
+##### All in first range
+```{bash eval=FALSE, include=TRUE}
+# bash
+./sashimi-plot.py -b input_bams.tsv -c 4:9807598-9827928 -g annotation_bee_4.5.gtf -M 10 -C 3 -O 3 --shrink --alpha 0.25 --base-size=20 --ann-height=4 --height=3 --width=18 -P palette.txt
+```
+
+##### All in second range
+```{bash eval=FALSE, include=TRUE}
+# bash
+./sashimi-plot.py -b input_bams.tsv -c 4:9827928-9840852 -g annotation_bee_4.5.gtf -M 10 -C 3 -O 3 --shrink --alpha 0.25 --base-size=20 --ann-height=4 --height=3 --width=18 -P palette.txt
+```
+
+##### 3692
+```{bash eval=FALSE, include=TRUE}
+./sashimi-plot.py -b 3692bams.tsv -c 4:9827928-9840852 -g annotation_bee_4.5.gtf -M 10 -C 3 -O 3 --shrink --alpha 0.25 --base-size=20 --ann-height=4 --height=3 --width=18 -P palette.txt
+```
+
+##### 4042
+```{bash eval=FALSE, include=TRUE}
+./sashimi-plot.py -b 4024bams.tsv -c 4:9827928-9840852 -g annotation_bee_4.5.gtf -M 10 -C 3 -O 3 --shrink --alpha 0.25 --base-size=20 --ann-height=4 --height=3 --width=18 -P palette.txt
+```
+
+##### 4049
+```{bash eval=FALSE, include=TRUE}
+./sashimi-plot.py -b 4049bams.tsv -c 4:9827928-9840852 -g annotation_bee_4.5.gtf -M 10 -C 3 -O 3 --shrink --alpha 0.25 --base-size=20 --ann-height=4 --height=3 --width=18 -P palette.txt
+```
+
+## COMMAND OPTIONS
+
+```{bash eval=FALSE, include=TRUE}
+./sashimi-plot.py --help
+```
+
+```{bash eval=FALSE, include=TRUE}
+usage: sashimi-plot.py [-h] -b BAM -c COORDINATES [-o OUT_PREFIX]
+                       [-S OUT_STRAND] [-M MIN_COVERAGE] [-j JUNCTIONS_BED]
+                       [-g GTF] [-s STRAND] [--shrink] [-O OVERLAY] [-A AGGR]
+                       [-C COLOR_FACTOR] [--alpha ALPHA] [-P PALETTE]
+                       [-L LABELS] [--fix-y-scale] [--height HEIGHT]
+                       [--ann-height ANN_HEIGHT] [--width WIDTH]
+                       [--base-size BASE_SIZE] [-F OUT_FORMAT]
+                       [-R OUT_RESOLUTION] [--debug-info] [--version]
+
+Create sashimi plot for a given genomic region
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -b BAM, --bam BAM     Individual bam file or file with a list of bam files.
+                        In the case of a list of files the format is tsv:
+                        1col: id for bam file, 2col: path of bam file, 3+col:
+                        additional columns
+  -c COORDINATES, --coordinates COORDINATES
+                        Genomic region. Format: chr:start-end. Remember that
+                        bam coordinates are 0-based
+  -o OUT_PREFIX, --out-prefix OUT_PREFIX
+                        Prefix for plot file name [default=sashimi]
+  -S OUT_STRAND, --out-strand OUT_STRAND
+                        Only for --strand other than 'NONE'. Choose which
+                        signal strand to plot: <both> <plus> <minus>
+                        [default=both]
+  -M MIN_COVERAGE, --min-coverage MIN_COVERAGE
+                        Minimum number of reads supporting a junction to be
+                        drawn [default=1]
+  -j JUNCTIONS_BED, --junctions-bed JUNCTIONS_BED
+                        Junction BED file name [default=no junction file]
+  -g GTF, --gtf GTF     Gtf file with annotation (only exons is enough)
+  -s STRAND, --strand STRAND
+                        Strand specificity: <NONE> <SENSE> <ANTISENSE>
+                        <MATE1_SENSE> <MATE2_SENSE> [default=NONE]
+  --shrink              Shrink the junctions by a factor for nicer display
+                        [default=False]
+  -O OVERLAY, --overlay OVERLAY
+                        Index of column with overlay levels (1-based)
+  -A AGGR, --aggr AGGR  Aggregate function for overlay: <mean> <median>
+                        <mean_j> <median_j>. Use mean_j | median_j to keep
+                        density overlay but aggregate junction counts
+                        [default=no aggregation]
+  -C COLOR_FACTOR, --color-factor COLOR_FACTOR
+                        Index of column with color levels (1-based)
+  --alpha ALPHA         Transparency level for density histogram [default=0.5]
+  -P PALETTE, --palette PALETTE
+                        Color palette file. tsv file with >=1 columns, where
+                        the color is the first column. Both R color names and
+                        hexadecimal values are valid
+  -L LABELS, --labels LABELS
+                        Index of column with labels (1-based) [default=1]
+  --fix-y-scale         Fix y-scale across individual signal plots
+                        [default=False]
+  --height HEIGHT       Height of the individual signal plot in inches
+                        [default=2]
+  --ann-height ANN_HEIGHT
+                        Height of annotation plot in inches [default=1.5]
+  --width WIDTH         Width of the plot in inches [default=10]
+  --base-size BASE_SIZE
+                        Base font size of the plot in pch [default=14]
+  -F OUT_FORMAT, --out-format OUT_FORMAT
+                        Output file format: <pdf> <svg> <png> <jpeg> <tiff>
+                        [default=pdf]
+  -R OUT_RESOLUTION, --out-resolution OUT_RESOLUTION
+                        Output file resolution in PPI (pixels per inch).
+                        Applies only to raster output formats [default=300]
+  --debug-info          Show several system information useful for debugging
+                        purposes [default=None]
+  --version             show program's version number and exit
+
+```
+
